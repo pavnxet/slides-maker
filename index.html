@@ -116,76 +116,67 @@
 
     <!-- Hidden Rendering Container -->
     <div id="renderContainer" class="fixed top-0 left-0 -z-50 pointer-events-none opacity-0 overflow-hidden" style="width: 1920px; height: 1080px;">
-        <!-- Slide Template -->
-        <div id="slideTemplate" class="w-[1920px] h-[1080px] bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] relative p-16 flex flex-col justify-between text-white font-sans">
+        <div id="slideTemplate" class="w-[1920px] h-[1080px] bg-white relative p-20 flex flex-row gap-16 text-slate-900 font-sans">
 
-            <!-- Watermark / Branding -->
-            <div class="absolute top-8 right-8 text-white/10 font-bold text-4xl select-none pointer-events-none">
+            <div class="absolute top-8 right-12 text-gray-200 font-bold text-4xl select-none pointer-events-none">
                 MCQ SLIDES
             </div>
 
-            <!-- Question Area (Top Half) -->
-            <div class="flex-1 flex flex-col justify-center items-center text-center space-y-8 mb-8 border-b border-white/10 pb-8">
-                <div class="bg-white/5 px-6 py-2 rounded-full border border-white/10 text-blue-400 font-mono text-2xl mb-4">
-                    Question <span id="slideQNum">01</span>
-                </div>
-                <h1 id="slideQuestionEn" class="text-5xl font-bold leading-tight max-w-5xl text-white drop-shadow-lg">
-                    <!-- English Question Here -->
-                </h1>
-                <h2 id="slideQuestionHi" class="text-4xl font-medium leading-relaxed max-w-5xl text-gray-300 font-hindi drop-shadow-md">
-                    <!-- Hindi Question Here -->
-                </h2>
-            </div>
+            <div class="w-[65%] flex flex-col justify-between py-10">
 
-            <!-- Options Area (Bottom Half - 2x2 Grid) -->
-            <div class="h-[40%] grid grid-cols-2 gap-8 px-16">
-                <!-- Option A -->
-                <div class="bg-white/5 border border-white/10 rounded-2xl flex items-center p-6 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="w-16 h-16 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-3xl font-bold mr-6 shrink-0 border border-blue-500/30">
-                        A
+                <div class="space-y-8">
+                    <div class="inline-block bg-blue-100 px-8 py-3 rounded-2xl border border-blue-200 text-blue-700 font-mono text-3xl font-bold">
+                        Question <span id="slideQNum">01</span>
                     </div>
-                    <div id="slideOptA" class="text-3xl text-gray-200 font-medium">
-                        <!-- Option Text -->
+
+                    <div class="space-y-6">
+                        <h1 id="slideQuestionEn" class="text-5xl font-bold leading-tight text-slate-900">
+                            <!-- English Question Here -->
+                        </h1>
+                        <h2 id="slideQuestionHi" class="text-4xl font-medium leading-relaxed text-slate-600 font-hindi border-l-4 border-blue-500 pl-6">
+                            <!-- Hindi Question Here -->
+                        </h2>
                     </div>
                 </div>
 
-                <!-- Option B -->
-                <div class="bg-white/5 border border-white/10 rounded-2xl flex items-center p-6 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="w-16 h-16 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-3xl font-bold mr-6 shrink-0 border border-purple-500/30">
-                        B
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="bg-slate-50 border-2 border-slate-100 rounded-3xl flex items-center p-8 shadow-sm">
+                        <div class="w-16 h-16 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-3xl font-bold mr-6 shrink-0">
+                            A
+                        </div>
+                        <div id="slideOptA" class="text-3xl text-slate-800 font-semibold"></div>
                     </div>
-                    <div id="slideOptB" class="text-3xl text-gray-200 font-medium">
-                        <!-- Option Text -->
-                    </div>
-                </div>
 
-                <!-- Option C -->
-                <div class="bg-white/5 border border-white/10 rounded-2xl flex items-center p-6 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="w-16 h-16 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl font-bold mr-6 shrink-0 border border-emerald-500/30">
-                        C
+                    <div class="bg-slate-50 border-2 border-slate-100 rounded-3xl flex items-center p-8 shadow-sm">
+                        <div class="w-16 h-16 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-3xl font-bold mr-6 shrink-0">
+                            B
+                        </div>
+                        <div id="slideOptB" class="text-3xl text-slate-800 font-semibold"></div>
                     </div>
-                    <div id="slideOptC" class="text-3xl text-gray-200 font-medium">
-                        <!-- Option Text -->
-                    </div>
-                </div>
 
-                <!-- Option D -->
-                <div class="bg-white/5 border border-white/10 rounded-2xl flex items-center p-6 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="w-16 h-16 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center text-3xl font-bold mr-6 shrink-0 border border-pink-500/30">
-                        D
+                    <div class="bg-slate-50 border-2 border-slate-100 rounded-3xl flex items-center p-8 shadow-sm">
+                        <div class="w-16 h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-3xl font-bold mr-6 shrink-0">
+                            C
+                        </div>
+                        <div id="slideOptC" class="text-3xl text-slate-800 font-semibold"></div>
                     </div>
-                    <div id="slideOptD" class="text-3xl text-gray-200 font-medium">
-                        <!-- Option Text -->
+
+                    <div class="bg-slate-50 border-2 border-slate-100 rounded-3xl flex items-center p-8 shadow-sm">
+                        <div class="w-16 h-16 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-3xl font-bold mr-6 shrink-0">
+                            D
+                        </div>
+                        <div id="slideOptD" class="text-3xl text-slate-800 font-semibold"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="absolute bottom-6 w-full text-center text-white/20 text-xl font-mono left-0">
+            <div class="w-[35%] h-full border-l-2 border-dashed border-gray-100 flex flex-col justify-end items-center pb-10">
+                <div class="text-gray-300 text-xl font-mono italic">
+                    Solution Space
+                </div>
+            </div>
+
+            <div class="absolute bottom-6 left-20 text-gray-400 text-lg font-mono">
                 Created with MCQ Slide Generator
             </div>
         </div>
