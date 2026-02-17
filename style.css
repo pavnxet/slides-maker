@@ -1,3 +1,9 @@
+/*
+ * Project: MCQ Slide Generator
+ * Author: pavnxet
+ * Repository: github.com/pavnxet/slides-maker
+ */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap');
 
 /* Typography */
@@ -39,6 +45,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .animate-pulse-fast {
     animation: pulse-fast 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Watermark Animation */
+@keyframes float-badge {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+a[href*="github.com/pavnxet/slides-maker"] {
+    animation: float-badge 4s ease-in-out infinite;
 }
 
 /* Glassmorphism Utilities */

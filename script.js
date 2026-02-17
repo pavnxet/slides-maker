@@ -10,7 +10,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // DOM Elements
-const elements = {
+const PAVNXET_ELEMENTS = {
     input: document.getElementById('questionInput'),
     generateBtn: document.getElementById('generateBtn'),
     clearBtn: document.getElementById('clearBtn'),
@@ -47,14 +47,14 @@ function log(message, type = 'info') {
     div.className = `${color} font-mono text-xs hover:bg-white/5 p-0.5 rounded transition-colors`;
     div.innerHTML = `<span class="opacity-50">[${timestamp}]</span> ${message}`;
 
-    elements.logWindow.appendChild(div);
-    elements.logWindow.scrollTop = elements.logWindow.scrollHeight;
+    PAVNXET_ELEMENTS.logWindow.appendChild(div);
+    PAVNXET_ELEMENTS.logWindow.scrollTop = PAVNXET_ELEMENTS.logWindow.scrollHeight;
 }
 
 // Progress Bar Helper
 function updateProgress(percent) {
-    elements.progressBar.style.width = `${percent}%`;
-    elements.progressText.innerText = `${Math.round(percent)}%`;
+    PAVNXET_ELEMENTS.progressBar.style.width = `${percent}%`;
+    PAVNXET_ELEMENTS.progressText.innerText = `${Math.round(percent)}%`;
 }
 
 // Parser Logic
@@ -168,10 +168,10 @@ function parseQuestions(text) {
 
 // Theme Handling
 function switchTheme(theme) {
-    elements.renderContainer.setAttribute('data-theme', theme);
+    PAVNXET_ELEMENTS.renderContainer.setAttribute('data-theme', theme);
 
     // Update Badge Styles based on theme
-    const badges = elements.renderContainer.querySelectorAll('.opt-badge');
+    const badges = PAVNXET_ELEMENTS.renderContainer.querySelectorAll('.opt-badge');
     const badgeColors = ['badge-A', 'badge-B', 'badge-C', 'badge-D'];
 
     badges.forEach((badge, index) => {
@@ -193,12 +193,12 @@ function switchTheme(theme) {
     // Dark Mode Specific Backgrounds
     const bgElements = document.getElementById('bgElements');
     if (theme === 'dark') {
-        elements.renderContainer.classList.add('bg-[#0f172a]', 'text-white');
-        elements.renderContainer.classList.remove('bg-white', 'text-slate-900');
+        PAVNXET_ELEMENTS.renderContainer.classList.add('bg-[#0f172a]', 'text-white');
+        PAVNXET_ELEMENTS.renderContainer.classList.remove('bg-white', 'text-slate-900');
         bgElements.style.opacity = '1';
     } else {
-        elements.renderContainer.classList.add('bg-white', 'text-slate-900');
-        elements.renderContainer.classList.remove('bg-[#0f172a]', 'text-white');
+        PAVNXET_ELEMENTS.renderContainer.classList.add('bg-white', 'text-slate-900');
+        PAVNXET_ELEMENTS.renderContainer.classList.remove('bg-[#0f172a]', 'text-white');
         bgElements.style.opacity = '0';
     }
 
@@ -208,7 +208,7 @@ function switchTheme(theme) {
 
 // Live Preview
 function updatePreview() {
-    const text = elements.input.value;
+    const text = PAVNXET_ELEMENTS.input.value;
     if (!text.trim()) return;
 
     const questions = parseQuestions(text);
@@ -216,25 +216,25 @@ function updatePreview() {
         const q = questions[0]; // Preview first question
 
         // Populate DOM
-        elements.slideQNum.innerText = q.id.padStart(2, '0');
-        elements.slideQuestionEn.innerText = q.textEn;
-        elements.slideQuestionHi.innerText = q.textHi;
-        elements.slideOptA.innerText = q.options.a;
-        elements.slideOptB.innerText = q.options.b;
-        elements.slideOptC.innerText = q.options.c;
-        elements.slideOptD.innerText = q.options.d;
+        PAVNXET_ELEMENTS.slideQNum.innerText = q.id.padStart(2, '0');
+        PAVNXET_ELEMENTS.slideQuestionEn.innerText = q.textEn;
+        PAVNXET_ELEMENTS.slideQuestionHi.innerText = q.textHi;
+        PAVNXET_ELEMENTS.slideOptA.innerText = q.options.a;
+        PAVNXET_ELEMENTS.slideOptB.innerText = q.options.b;
+        PAVNXET_ELEMENTS.slideOptC.innerText = q.options.c;
+        PAVNXET_ELEMENTS.slideOptD.innerText = q.options.d;
 
         // Clone rendering container into preview container
         // We use transform scale to fit 1920x1080 into the small box
-        const scale = elements.previewContainer.clientWidth / 1920;
+        const scale = PAVNXET_ELEMENTS.previewContainer.clientWidth / 1920;
 
         // Simply clone the innerHTML to preview container
         // But we need to keep the style context.
         // Actually, we can just style the previewContainer to show the #slideTemplate using CSS transform
         // But #slideTemplate is hidden. Let's make a visible clone.
 
-        elements.previewContainer.innerHTML = '';
-        const clone = elements.renderContainer.cloneNode(true);
+        PAVNXET_ELEMENTS.previewContainer.innerHTML = '';
+        const clone = PAVNXET_ELEMENTS.renderContainer.cloneNode(true);
         clone.id = 'previewSlide';
         clone.classList.remove('fixed', '-z-50', 'opacity-0', 'pointer-events-none');
         clone.style.transform = `scale(${scale})`;
@@ -242,7 +242,7 @@ function updatePreview() {
         clone.style.width = '1920px';
         clone.style.height = '1080px';
 
-        elements.previewContainer.appendChild(clone);
+        PAVNXET_ELEMENTS.previewContainer.appendChild(clone);
     }
 }
 
@@ -250,15 +250,15 @@ function updatePreview() {
 async function generateSlides() {
     if (isProcessing) return;
 
-    const text = elements.input.value;
+    const text = PAVNXET_ELEMENTS.input.value;
     if (!text.trim()) {
         log('Error: Input is empty.', 'error');
         return;
     }
 
     isProcessing = true;
-    elements.generateBtn.disabled = true;
-    elements.generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    PAVNXET_ELEMENTS.generateBtn.disabled = true;
+    PAVNXET_ELEMENTS.generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
     updateProgress(0);
     log('Starting process...', 'process');
 
@@ -290,19 +290,19 @@ async function generateSlides() {
             log(`Rendering Slide ${i + 1}/${total}...`);
 
             // Populate DOM
-            elements.slideQNum.innerText = q.id.padStart(2, '0');
-            elements.slideQuestionEn.innerText = q.textEn;
-            elements.slideQuestionHi.innerText = q.textHi;
-            elements.slideOptA.innerText = q.options.a;
-            elements.slideOptB.innerText = q.options.b;
-            elements.slideOptC.innerText = q.options.c;
-            elements.slideOptD.innerText = q.options.d;
+            PAVNXET_ELEMENTS.slideQNum.innerText = q.id.padStart(2, '0');
+            PAVNXET_ELEMENTS.slideQuestionEn.innerText = q.textEn;
+            PAVNXET_ELEMENTS.slideQuestionHi.innerText = q.textHi;
+            PAVNXET_ELEMENTS.slideOptA.innerText = q.options.a;
+            PAVNXET_ELEMENTS.slideOptB.innerText = q.options.b;
+            PAVNXET_ELEMENTS.slideOptC.innerText = q.options.c;
+            PAVNXET_ELEMENTS.slideOptD.innerText = q.options.d;
 
             // Wait for DOM update
             await new Promise(r => setTimeout(r, 50));
 
             // Capture with JPEG compression
-            const canvas = await html2canvas(elements.renderContainer, {
+            const canvas = await html2canvas(PAVNXET_ELEMENTS.renderContainer, {
                 scale: 1,
                 useCORS: true,
                 backgroundColor: null,
@@ -329,8 +329,8 @@ async function generateSlides() {
         console.error(error);
     } finally {
         isProcessing = false;
-        elements.generateBtn.disabled = false;
-        elements.generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        PAVNXET_ELEMENTS.generateBtn.disabled = false;
+        PAVNXET_ELEMENTS.generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
         setTimeout(() => {
             if (!isProcessing) {
@@ -341,27 +341,27 @@ async function generateSlides() {
 }
 
 // Event Listeners
-elements.generateBtn.addEventListener('click', generateSlides);
+PAVNXET_ELEMENTS.generateBtn.addEventListener('click', generateSlides);
 
-elements.clearBtn.addEventListener('click', () => {
-    elements.input.value = '';
+PAVNXET_ELEMENTS.clearBtn.addEventListener('click', () => {
+    PAVNXET_ELEMENTS.input.value = '';
     log('Input cleared.', 'info');
     updateProgress(0);
-    elements.previewContainer.innerHTML = ''; // Clear preview
+    PAVNXET_ELEMENTS.previewContainer.innerHTML = ''; // Clear preview
 });
 
-elements.themeSelect.addEventListener('change', (e) => {
+PAVNXET_ELEMENTS.themeSelect.addEventListener('change', (e) => {
     switchTheme(e.target.value);
 });
 
-elements.input.addEventListener('input', () => {
+PAVNXET_ELEMENTS.input.addEventListener('input', () => {
     clearTimeout(previewTimeout);
     previewTimeout = setTimeout(updatePreview, 500); // Debounce
 });
 
 // Window Resize Handling for Preview Scaling
 window.addEventListener('resize', () => {
-    if (elements.input.value.trim()) {
+    if (PAVNXET_ELEMENTS.input.value.trim()) {
         updatePreview();
     }
 });
@@ -370,3 +370,6 @@ window.addEventListener('resize', () => {
 switchTheme('whiteboard');
 log('System initialized.');
 log('PWA Service Worker ready.');
+
+// Watermark Greeting
+console.log("%c🚀 Powered by slides-maker | github.com/pavnxet/slides-maker", "font-weight: bold; font-size: 14px; color: #3b82f6; padding: 10px; border: 1px solid #3b82f6; border-radius: 5px;");
