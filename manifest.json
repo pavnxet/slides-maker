@@ -1,0 +1,15 @@
+{
+  "name": "MCQ Slide Generator",
+  "short_name": "MCQ Gen",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "https://cdn.jsdelivr.net/npm/lucide-static@0.284.0/icons/file-text.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ]
+}
