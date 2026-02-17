@@ -57,18 +57,18 @@ function parseQuestions(text) {
 
     // Helper to extract options from a line
     function extractOptions(line, qObj) {
-        // Regex to support both (a) and a. formats
-        const patterns = {
-            a: /(?:\(a\)|a\.)\s*(.+?)(?=\s*(?:\(b\)|b\.)|$)/i,
-            b: /(?:\(b\)|b\.)\s*(.+?)(?=\s*(?:\(c\)|c\.)|$)/i,
-            c: /(?:\(c\)|c\.)\s*(.+?)(?=\s*(?:\(d\)|d\.)|$)/i,
-            d: /(?:\(d\)|d\.)\s*(.+)/i
-        };
+        // Regex matches prefixes like (a), a., A), A.
+        // and handles multiple options on one line or single options in a list.
+        const optionRegex = /(?:\(|\b)([a-d])(?:\.|\))\s*(.+?)(?=(?:\s*[\(\[]?[a-d][\.\)\]])|$)/gi;
 
-        Object.keys(patterns).forEach(opt => {
-            const match = line.match(patterns[opt]);
-            if (match) qObj.options[opt] = match[1].trim();
-        });
+        let match;
+        while ((match = optionRegex.exec(line)) !== null) {
+            const letter = match[1].toLowerCase();
+            const text = match[2].trim();
+            if (qObj.options.hasOwnProperty(letter)) {
+                qObj.options[letter] = text;
+            }
+        }
     }
 
     for (let i = 0; i < lines.length; i++) {
@@ -94,7 +94,8 @@ function parseQuestions(text) {
             // But we need to be careful not to consume options if they appear immediately
             if (i + 1 < lines.length) {
                 const nextLine = lines[i+1];
-                const isNextLineOption = /(?:\(a\)|a\.)/.test(nextLine);
+                // Check if next line looks like an option (a., (a), A., A))
+                const isNextLineOption = /(?:\(|\b)[a-d](?:\.|\))/i.test(nextLine);
                 const isNextLineQuestion = /^\d+\./.test(nextLine);
 
                 if (!isNextLineQuestion && !isNextLineOption) {
