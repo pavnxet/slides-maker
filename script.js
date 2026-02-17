@@ -51,56 +51,25 @@ function parseQuestions(text) {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line !== '');
 
     let currentQuestion = null;
-    let state = 'IDLE'; // IDLE, QUESTION_EN, QUESTION_HI, OPTIONS
 
     // Regex patterns
     const questionStartRegex = /^(\d+)\.\s*(.+)/;
-    const optionARegex = /\(a\)\s*(.+?)(?=\s*\(b\)|$)/;
-    const optionBRegex = /\(b\)\s*(.+?)(?=\s*\(c\)|\(d\)|$)/;
-    const optionCRegex = /\(c\)\s*(.+?)(?=\s*\(d\)|$)/;
-    const optionDRegex = /\(d\)\s*(.+)/;
 
     // Helper to extract options from a line
     function extractOptions(line, qObj) {
-        // Try to match (a) ... (b) ...
-        // and (c) ... (d) ...
-        // This is a simple parser assuming the format is relatively consistent
+        // Regex to support both (a) and a. formats
+        const patterns = {
+            a: /(?:\(a\)|a\.)\s*(.+?)(?=\s*(?:\(b\)|b\.)|$)/i,
+            b: /(?:\(b\)|b\.)\s*(.+?)(?=\s*(?:\(c\)|c\.)|$)/i,
+            c: /(?:\(c\)|c\.)\s*(.+?)(?=\s*(?:\(d\)|d\.)|$)/i,
+            d: /(?:\(d\)|d\.)\s*(.+)/i
+        };
 
-        // Check for (a) and (b)
-        if (line.includes('(a)')) {
-            const matchA = line.match(/\(a\)\s*(.+?)(?=\s*\(b\)|$)/);
-            if (matchA) qObj.options.a = matchA[1].trim();
-
-            const matchB = line.match(/\(b\)\s*(.+?)(?=\s*\(c\)|\(d\)|$)/); // (b) usually followed by nothing or end of line in this format, but let's be safe
-            if (matchB) qObj.options.b = matchB[1].trim();
-
-            // In case (a) (b) (c) (d) are all on one line
-             const matchC = line.match(/\(c\)\s*(.+?)(?=\s*\(d\)|$)/);
-             if (matchC) qObj.options.c = matchC[1].trim();
-
-             const matchD = line.match(/\(d\)\s*(.+)/);
-             if (matchD) qObj.options.d = matchD[1].trim();
-        }
-        // Check for (c) and (d)
-        else if (line.includes('(c)')) {
-            const matchC = line.match(/\(c\)\s*(.+?)(?=\s*\(d\)|$)/);
-            if (matchC) qObj.options.c = matchC[1].trim();
-
-            const matchD = line.match(/\(d\)\s*(.+)/);
-            if (matchD) qObj.options.d = matchD[1].trim();
-        }
+        Object.keys(patterns).forEach(opt => {
+            const match = line.match(patterns[opt]);
+            if (match) qObj.options[opt] = match[1].trim();
+        });
     }
-
-    // We'll iterate through lines and try to build question objects
-    // This is a state machine approach
-
-    /*
-      The format is:
-      1. [English]
-      [Hindi]
-      (a)... (b)...
-      (c)... (d)...
-    */
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -125,7 +94,10 @@ function parseQuestions(text) {
             // But we need to be careful not to consume options if they appear immediately
             if (i + 1 < lines.length) {
                 const nextLine = lines[i+1];
-                if (!nextLine.match(/^\d+\./) && !nextLine.includes('(a)')) {
+                const isNextLineOption = /(?:\(a\)|a\.)/.test(nextLine);
+                const isNextLineQuestion = /^\d+\./.test(nextLine);
+
+                if (!isNextLineQuestion && !isNextLineOption) {
                    currentQuestion.textHi = nextLine;
                    i++; // Skip next line
                 }
