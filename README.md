@@ -14,7 +14,7 @@
 
 - **🎨 Modern Design**: Sleek "Glassmorphism" UI with dark mode support for a premium feel.
 - **🚀 Instant PDF Generation**: Uses client-side processing to generate high-quality PDFs in seconds without server uploads.
-- **📄 Robust Parsing Engine**: Intelligently parses questions in English and Hindi, handling various numbering formats (1., Q1, etc.) and options ((a), A., etc.).
+- **📄 Robust Parsing Engine**: Parses questions in English and Hindi with support for multiline and inline options (`(a) OptA (b) OptB` on a single line).
 - **🌓 Multiple Themes**:
     - **Whiteboard Mode**: Clean white background optimized for teaching.
     - **Dark Mode**: High-contrast dark theme for screen presentations.
@@ -36,25 +36,19 @@
 ## 📖 Usage Guide
 
 ### 1. Input Format
-Paste your questions into the text area. The parser supports the following structure:
+Paste your questions into the text area. Options can be on separate lines or inline:
 
-```text
-1. This is the question text in English.
-   (Optional) This is the question text in Hindi.
-(a) Option A text   (b) Option B text
-(c) Option C text   (d) Option D text
-```
-
-**Example:**
+**Multiline format:**
 ```text
 1. What is the capital of France?
    फ्रांस की राजधानी क्या है?
 (a) Berlin          (b) Madrid
 (c) Paris           (d) Rome
+```
 
-2. Which planet is known as the Red Planet?
-(a) Earth           (b) Mars
-(c) Jupiter         (d) Saturn
+**Inline format:**
+```text
+2. Which planet is the Red Planet? (a) Earth (b) Mars (c) Jupiter (d) Saturn
 ```
 
 ### 2. Customization
@@ -88,6 +82,11 @@ Paste your questions into the text area. The parser supports the following struc
 
 3. **Open in Browser**
    Navigate to `http://localhost:3000` to view the app.
+
+### Run Tests
+```bash
+node test_parser.js
+```
 
 ---
 
