@@ -138,20 +138,21 @@ function parseQuestions(text) {
             // If options are inline, the lookahead fails, and match[2] eats everything.
 
             if (!options.a && !options.b) {
-                // Try inline parsing from the question text
-                 let inlineOptionMatch;
-                 // Reset regex for inline search
-                 const inlineOptionRegex = /(?:\(|\[)?([a-dA-D])(?:\)|\]|\.)\s+([\s\S]+?)(?=(?:\s(?:\(|\[)?[a-dA-D](?:\)|\]|\.)\s)|$)/g;
-
-                 // If we find options in textEn/Hi, we need to strip them from textEn/Hi.
-                 // This is complex. Let's assume the user uses the robust newline format for now as per instructions.
-                 // "Input: A large auto-expanding textarea for pasting multiple questions."
-                 // "Format: [Question Number]. [Text] (a) Option 1..."
-
-                 // If the user provided format is:
-                 // 1. Question (a) ...
-                 // My lookahead `(?=\n...)` expects newline.
-                 // Let's relax the lookahead to allow space if standard format `(a)` is used.
+                const inlineOptionRegex = /(?:\(|\[)?([a-dA-D])(?:\)|\]|\.)\s+([\s\S]+?)(?=(?:\s(?:\(|\[)?[a-dA-D](?:\)|\]|\.)\s)|$)/g;
+                let inlineOptionMatch;
+                while ((inlineOptionMatch = inlineOptionRegex.exec(rawQuestionText)) !== null) {
+                    const label = inlineOptionMatch[1].toLowerCase();
+                    const optText = inlineOptionMatch[2].trim();
+                    if (options.hasOwnProperty(label)) {
+                        options[label] = optText;
+                    }
+                }
+                if (options.a || options.b) {
+                    const lastOptionEnd = rawQuestionText.lastIndexOf(options.d || options.c || options.b || options.a);
+                    const stripped = rawQuestionText.substring(0, lastOptionEnd).replace(/[\s\(]*(?:[a-dA-D][\.\)\]\s]+)$/, '').trim();
+                    if (stripped) textEn = stripped;
+                    textHi = '';
+                }
             }
 
             questions.push({
@@ -334,7 +335,7 @@ async function generateSlides() {
 
         setTimeout(() => {
             if (!isProcessing) {
-               // updateProgress(0);
+                updateProgress(0);
             }
         }, 3000);
     }

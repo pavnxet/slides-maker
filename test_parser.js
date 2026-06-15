@@ -1,85 +1,46 @@
-
-// Parser Logic (Copied from script.js for testing)
 function parseQuestions(text) {
     const questions = [];
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line !== '');
+    text = text.replace(/\r\n/g, '\n').replace(/^\uFEFF/, '');
+    const questionBlocks = text.split(/\n(?=\d+\.\s)/).filter(block => block.trim().length > 0);
 
-    let currentQuestion = null;
-
-    // Regex patterns
-    const questionStartRegex = /^(\d+)\.\s*(.+)/;
-
-    // Helper to extract options from a line
-    function extractOptions(line, qObj) {
-        // Check for (a) and (b)
-        if (line.includes('(a)')) {
-            const matchA = line.match(/\(a\)\s*(.+?)(?=\s*\(b\)|$)/);
-            if (matchA) qObj.options.a = matchA[1].trim();
-
-            const matchB = line.match(/\(b\)\s*(.+?)(?=\s*\(c\)|\(d\)|$)/);
-            if (matchB) qObj.options.b = matchB[1].trim();
-
-             const matchC = line.match(/\(c\)\s*(.+?)(?=\s*\(d\)|$)/);
-             if (matchC) qObj.options.c = matchC[1].trim();
-
-             const matchD = line.match(/\(d\)\s*(.+)/);
-             if (matchD) qObj.options.d = matchD[1].trim();
-        }
-        // Check for (c) and (d)
-        else if (line.includes('(c)')) {
-            const matchC = line.match(/\(c\)\s*(.+?)(?=\s*\(d\)|$)/);
-            if (matchC) qObj.options.c = matchC[1].trim();
-
-            const matchD = line.match(/\(d\)\s*(.+)/);
-            if (matchD) qObj.options.d = matchD[1].trim();
-        }
-    }
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-
-        // Check if new question starts
-        const qMatch = line.match(questionStartRegex);
-        if (qMatch) {
-            // Save previous question if exists
-            if (currentQuestion) {
-                questions.push(currentQuestion);
+    questionBlocks.forEach(block => {
+        const questionMatch = block.match(/^(\d+)\.\s+([\s\S]+?)(?=(?:\n\s*(?:[a-dA-D]\.|[a-dA-D]\)|(?:\(|\[)[a-dA-D](?:\)|\])))|$)/);
+        if (questionMatch) {
+            const id = questionMatch[1];
+            let rawQuestionText = questionMatch[2].trim();
+            const qLines = rawQuestionText.split('\n').map(l => l.trim()).filter(l => l);
+            let textEn = qLines[0] || "";
+            let textHi = qLines.length > 1 ? qLines.slice(1).join('\n') : "";
+            const options = { a: '', b: '', c: '', d: '' };
+            const optionRegex = /(?:^|\s)(?:\(|\[)?([a-dA-D])(?:\)|\]|\.)\s+([\s\S]+?)(?=(?:\s(?:\(|\[)?[a-dA-D](?:\)|\]|\.)\s)|$)/g;
+            const optionsText = block.substring(questionMatch[0].length);
+            let optionMatch;
+            while ((optionMatch = optionRegex.exec(optionsText)) !== null) {
+                const label = optionMatch[1].toLowerCase();
+                const optText = optionMatch[2].trim();
+                if (options.hasOwnProperty(label)) options[label] = optText;
             }
-
-            // Start new question
-            currentQuestion = {
-                id: qMatch[1],
-                textEn: qMatch[2],
-                textHi: '',
-                options: { a: '', b: '', c: '', d: '' }
-            };
-
-            // Look ahead for Hindi text (next line usually)
-            if (i + 1 < lines.length) {
-                const nextLine = lines[i+1];
-                if (!nextLine.match(/^\d+\./) && !nextLine.includes('(a)')) {
-                   currentQuestion.textHi = nextLine;
-                   i++; // Skip next line
+            if (!options.a && !options.b) {
+                const inlineOptionRegex = /(?:\(|\[)?([a-dA-D])(?:\)|\]|\.)\s+([\s\S]+?)(?=(?:\s(?:\(|\[)?[a-dA-D](?:\)|\]|\.)\s)|$)/g;
+                let inlineOptionMatch;
+                while ((inlineOptionMatch = inlineOptionRegex.exec(rawQuestionText)) !== null) {
+                    const label = inlineOptionMatch[1].toLowerCase();
+                    const optText = inlineOptionMatch[2].trim();
+                    if (options.hasOwnProperty(label)) options[label] = optText;
+                }
+                if (options.a || options.b) {
+                    const lastOptionEnd = rawQuestionText.lastIndexOf(options.d || options.c || options.b || options.a);
+                    const stripped = rawQuestionText.substring(0, lastOptionEnd).replace(/[\s\(]*(?:[a-dA-D][\.\)\]\s]+)$/, '').trim();
+                    if (stripped) textEn = stripped;
+                    textHi = '';
                 }
             }
-            continue;
+            questions.push({ id, textEn, textHi, options });
         }
-
-        // If we have a current question, look for options
-        if (currentQuestion) {
-            extractOptions(line, currentQuestion);
-        }
-    }
-
-    // Push the last question
-    if (currentQuestion) {
-        questions.push(currentQuestion);
-    }
-
+    });
     return questions;
 }
 
-// Test Data
 const sampleText = `
 1. What is the capital of France?
 फ्रांस की राजधानी क्या है?
@@ -92,19 +53,20 @@ const sampleText = `
 
 3. Single line options example?
 (a) One (b) Two (c) Three (d) Four
+
+4. Inline options test (a) Alpha (b) Beta (c) Gamma (d) Delta
 `;
 
 console.log("Running Parser Test...");
 const result = parseQuestions(sampleText);
 console.log(JSON.stringify(result, null, 2));
 
-// Assertions
 let passed = true;
 
-if (result.length === 3) {
-    console.log("PASS: Found 3 questions.");
+if (result.length === 4) {
+    console.log("PASS: Found 4 questions.");
 } else {
-    console.log("FAIL: Expected 3 questions, found " + result.length);
+    console.log("FAIL: Expected 4 questions, found " + result.length);
     passed = false;
 }
 
@@ -136,4 +98,19 @@ if (result[2].options.d === "Four") {
     passed = false;
 }
 
+if (result[3].options.a === "Alpha" && result[3].options.d === "Delta") {
+    console.log("PASS: Q4 inline options parsed.");
+} else {
+    console.log("FAIL: Q4 inline options - a:" + result[3].options.a + " d:" + result[3].options.d);
+    passed = false;
+}
+
+if (result[3].textEn.includes("Inline options test")) {
+    console.log("PASS: Q4 question text preserved after inline parse.");
+} else {
+    console.log("FAIL: Q4 textEn is '" + result[3].textEn + "'");
+    passed = false;
+}
+
 if (!passed) process.exit(1);
+console.log("\nAll tests passed!");
