@@ -340,7 +340,7 @@ async function generateSlides() {
 
             const outer = PAVNXET_ELEMENTS.renderContainer.parentElement;
             const outerPrev = outer.style.cssText;
-            outer.style.cssText = 'position:fixed;top:0;left:0;width:1920px;height:1080px;z-index:-1;opacity:1;pointer-events:none;overflow:hidden;';
+            outer.style.cssText = 'position:fixed;top:0;left:-9999px;width:1920px;height:1080px;opacity:1;pointer-events:none;overflow:hidden;';
 
             const canvas = await html2canvas(outer, {
                 scale: 2,
