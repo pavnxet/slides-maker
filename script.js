@@ -191,17 +191,9 @@ function switchTheme(theme) {
         }
     });
 
-    // Dark Mode Specific Backgrounds
+    // Dark Mode Background Elements
     const bgElements = document.getElementById('bgElements');
-    if (theme === 'dark') {
-        PAVNXET_ELEMENTS.renderContainer.classList.add('bg-[#0f172a]', 'text-white');
-        PAVNXET_ELEMENTS.renderContainer.classList.remove('bg-white', 'text-slate-900');
-        bgElements.style.opacity = '1';
-    } else {
-        PAVNXET_ELEMENTS.renderContainer.classList.add('bg-white', 'text-slate-900');
-        PAVNXET_ELEMENTS.renderContainer.classList.remove('bg-[#0f172a]', 'text-white');
-        bgElements.style.opacity = '0';
-    }
+    bgElements.style.opacity = theme === 'dark' ? '1' : '0';
 
     log(`Switched to ${theme} theme.`);
     updatePreview(); // Re-render preview
@@ -299,22 +291,25 @@ async function generateSlides() {
             PAVNXET_ELEMENTS.slideOptC.innerText = q.options.c;
             PAVNXET_ELEMENTS.slideOptD.innerText = q.options.d;
 
-            // Wait for DOM update
             await new Promise(r => setTimeout(r, 50));
 
-            // Capture with JPEG compression
-            const canvas = await html2canvas(PAVNXET_ELEMENTS.renderContainer, {
-                scale: 1,
+            const el = PAVNXET_ELEMENTS.renderContainer;
+            const prevStyle = el.style.cssText;
+            el.style.cssText = 'position:fixed;top:0;left:0;width:1920px;height:1080px;z-index:-1;opacity:1;pointer-events:none;overflow:hidden;';
+
+            const canvas = await html2canvas(el, {
+                scale: 2,
                 useCORS: true,
                 backgroundColor: null,
                 logging: false
             });
 
-            // Use JPEG with 0.8 quality for optimization
-            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            el.style.cssText = prevStyle;
+
+            const imgData = canvas.toDataURL('image/png');
 
             if (i > 0) doc.addPage([1920, 1080]);
-            doc.addImage(imgData, 'JPEG', 0, 0, 1920, 1080, undefined, 'FAST');
+            doc.addImage(imgData, 'PNG', 0, 0, 1920, 1080);
 
             updateProgress(((i + 1) / total) * 100);
         }
