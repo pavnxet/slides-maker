@@ -167,36 +167,81 @@ function parseQuestions(text) {
     return questions;
 }
 
-// Theme Handling
+const THEMES = {
+    whiteboard: {
+        bg: '#ffffff', text: '#0f172a', qHi: '#475569', qHiBorder: '#2563eb',
+        badge: { bg: '#eff6ff', color: '#1d4ed8', border: '2px solid #dbeafe' },
+        optBox: { bg: '#f8fafc', border: '2px solid #e2e8f0' },
+        optText: '#0f172a', solutionBorder: '2px dashed #e2e8f0',
+        solutionText: '#94a3b8', footer: '#cbd5e1', bgElements: false
+    },
+    dark: {
+        bg: '#0f172a', text: '#f8fafc', qHi: '#94a3b8', qHiBorder: '#3b82f6',
+        badge: { bg: 'rgba(59,130,246,0.1)', color: '#60a5fa', border: '2px solid rgba(59,130,246,0.2)' },
+        optBox: { bg: 'rgba(255,255,255,0.05)', border: '2px solid #334155' },
+        optText: '#f8fafc', solutionBorder: '2px dashed #334155',
+        solutionText: '#64748b', footer: '#475569', bgElements: true
+    },
+    print: {
+        bg: '#ffffff', text: '#000000', qHi: '#333333', qHiBorder: '#000000',
+        badge: { bg: '#ffffff', color: '#000000', border: '2px solid #000000' },
+        optBox: { bg: '#ffffff', border: '2px solid #000000' },
+        optText: '#000000', solutionBorder: '2px solid #000000',
+        solutionText: '#666666', footer: '#000000', bgElements: false
+    }
+};
+
 function switchTheme(theme) {
-    PAVNXET_ELEMENTS.renderContainer.setAttribute('data-theme', theme);
+    const t = THEMES[theme] || THEMES.whiteboard;
+    const el = PAVNXET_ELEMENTS.renderContainer;
 
-    // Update Badge Styles based on theme
-    const badges = PAVNXET_ELEMENTS.renderContainer.querySelectorAll('.opt-badge');
-    const badgeColors = ['badge-A', 'badge-B', 'badge-C', 'badge-D'];
+    el.setAttribute('data-theme', theme);
+    el.style.backgroundColor = t.bg;
+    el.style.color = t.text;
 
-    badges.forEach((badge, index) => {
-        // Reset classes
-        badge.className = `opt-badge w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold shrink-0 transition-colors duration-300`;
+    const qEn = el.querySelector('#slideQuestionEn');
+    const qHi = el.querySelector('#slideQuestionHi');
+    const qBadge = el.querySelector('#qBadge');
+    const solution = el.querySelector('#solutionSpace');
+    const footer = solution.querySelector('div:last-child');
+    const solutionText = solution.querySelector('div:first-child');
 
-        if (theme === 'print') {
-            badge.style.border = '2px solid black';
-            badge.style.color = 'black';
-            badge.style.backgroundColor = 'white';
-        } else {
-            badge.classList.add(badgeColors[index]);
-            badge.style.border = '';
-            badge.style.color = '';
-            badge.style.backgroundColor = '';
-        }
+    if (qEn) qEn.style.color = t.text;
+    if (qHi) { qHi.style.color = t.qHi; qHi.style.borderLeftColor = t.qHiBorder; }
+    if (qBadge) {
+        qBadge.style.backgroundColor = t.badge.bg;
+        qBadge.style.color = t.badge.color;
+        qBadge.style.border = t.badge.border;
+    }
+
+    el.querySelectorAll('.opt-box').forEach(box => {
+        box.style.backgroundColor = t.optBox.bg;
+        box.style.border = t.optBox.border;
     });
+    el.querySelectorAll('.opt-text').forEach(txt => { txt.style.color = t.optText; });
 
-    // Dark Mode Background Elements
-    const bgElements = document.getElementById('bgElements');
-    bgElements.style.opacity = theme === 'dark' ? '1' : '0';
+    if (theme === 'print') {
+        el.querySelectorAll('.opt-badge').forEach(b => {
+            b.style.backgroundColor = '#fff';
+            b.style.color = '#000';
+            b.style.border = '2px solid #000';
+        });
+    } else {
+        el.querySelectorAll('.opt-badge').forEach(b => {
+            b.style.backgroundColor = '';
+            b.style.color = '';
+            b.style.border = '';
+        });
+    }
+
+    if (solution) solution.style.borderLeft = t.solutionBorder;
+    if (solutionText) solutionText.style.color = t.solutionText;
+    if (footer) footer.style.color = t.footer;
+
+    document.getElementById('bgElements').style.opacity = t.bgElements ? '1' : '0';
 
     log(`Switched to ${theme} theme.`);
-    updatePreview(); // Re-render preview
+    updatePreview();
 }
 
 // Live Preview
@@ -293,18 +338,18 @@ async function generateSlides() {
 
             await new Promise(r => setTimeout(r, 50));
 
-            const el = PAVNXET_ELEMENTS.renderContainer;
-            const prevStyle = el.style.cssText;
-            el.style.cssText = 'position:fixed;top:0;left:0;width:1920px;height:1080px;z-index:-1;opacity:1;pointer-events:none;overflow:hidden;';
+            const outer = PAVNXET_ELEMENTS.renderContainer.parentElement;
+            const outerPrev = outer.style.cssText;
+            outer.style.cssText = 'position:fixed;top:0;left:0;width:1920px;height:1080px;z-index:-1;opacity:1;pointer-events:none;overflow:hidden;';
 
-            const canvas = await html2canvas(el, {
+            const canvas = await html2canvas(outer, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: null,
                 logging: false
             });
 
-            el.style.cssText = prevStyle;
+            outer.style.cssText = outerPrev;
 
             const imgData = canvas.toDataURL('image/png');
 
